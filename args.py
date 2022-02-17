@@ -10,7 +10,8 @@ def entry(entry_df):
         name = " ".join(racer[1].split()[:2])
         gen = racer[1].split()[2].split("/")[1]
         machine = racer[1].split()[4].split("/")[0]
-        handi, trial,  dev = racer[3].split()
+        racer3 = racer[3].replace("再", "")
+        handi, trial, dev = racer3.split()
         ranks = racer[4].split()
         if len(ranks) == 3:
             rank, pre_rank, point = ranks
@@ -30,12 +31,15 @@ def entry_data(entry_df):
     for racer in  entry_df.iloc[:,:].values:
         no = racer[0]
         name = "".join(racer[1].split()[:2])
-        handi, trial, dev = racer[3].split()
+        racer3 = racer[3].replace("再", "")
+        handi, trial, dev = racer3.split()
         rank = racer[4].split()[0]
         mean_trail, mean_race, _ = racer[5].split()
         handi_rank = handi.rjust(4, " ") + " " + rank
         trial = trial.rjust(4, " ") + " " + dev
         mean_values = mean_trail + " " + mean_race
+        racer6 = racer[6].split()
+        st_chakujun = racer6[1] + " " + racer6[0][3:8]
 
         p = "./photos"
         d_files = os.listdir(p)
@@ -44,7 +48,7 @@ def entry_data(entry_df):
         filename = ""
         if len(jpgs) == 1:
             filename = jpgs[0]
-        racers.append((no, filename, name, handi_rank, trial, mean_values))
+        racers.append((no, filename, name, handi_rank, trial, mean_values, st_chakujun))
     
     return racers
 
@@ -57,7 +61,7 @@ if __name__ == '__main__':
         races = pickle.load(f)
 
     for race in races:
-        entry_df = race[0]
+        entry_df = race[1]
         ret = entry_data(entry_df)
         print(ret)
 

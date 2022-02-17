@@ -19,7 +19,6 @@ green = 75,197,147 # Shamrock
 orange = 200,122,50 # Bronze
 pink = 177,102,182 # Fuchsia
 
-title = "2022/02/13 伊勢崎 1R 一般戦Ｂ 3100m(6周)"
 
 if __name__ == '__main__':
 
@@ -29,7 +28,7 @@ if __name__ == '__main__':
     font18 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 18)
     font14 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 14)
 
-    title_text = font18.render(title, True, (0,0,0))
+    title_text = font18.render("title", True, (0,0,0))
     screen.blit(title_text, (20, 20))
 
     x_d = {n: 15+96*(n-1) for n in range(1,9)}
