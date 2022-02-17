@@ -23,6 +23,7 @@ v = 360 / 30 # 12 dgree -> 10m
 draw.pieslice((10, 10, 10+D+180, 100+D+90), start=90+1*v, end=90+2*v, outline=sundance)
 draw.pieslice((10, 10, 10+D+180, 100+D+90), start=90+3*v, end=90+4*v, outline=sundance)
 draw.pieslice((10, 10, 10+D+180, 100+D+90), start=90+5*v, end=90+6*v, outline=sundance)
+draw.pieslice((10, 10, 10+D+180, 100+D+90), start=90+7*v, end=90+8*v, outline=sundance)
 
 draw.chord((100, 100, 100+D, 100+D), start=90, end=270, fill=freespeech)
 draw.chord((100+300, 100, 100+D+300, 100+D), start=270, end=90, fill=freespeech)

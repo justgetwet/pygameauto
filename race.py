@@ -2,10 +2,7 @@ import numpy as np
 import pickle
 import pygame
 from pygame.locals import QUIT
-from scipy.integrate import odeint
 import sys
-
-from sympy import stationary_points
 
 from course import course, D, R # 286.4788975654116, 143.2394487827058
 from equations import quadratic_equation
@@ -83,6 +80,16 @@ def start_position(handi, c):
     y = (R+c-10) * np.sin(rd)
     return x+100+R, y+230+100+R+6
 
+def set_start_potision(n):
+    pos = []
+    for racer in entry_datas[n-1]:
+        n, handi_rank = racer[0], racer[3]
+        handi, _ = handi_rank.split()
+        color = color_d[n]
+        pos.append((n, color, int(handi.strip("m"))))
+
+    return pos
+
 def load_race(n):
     # exec racer_render()
     for racer in entry_datas[n-1]:
@@ -92,17 +99,6 @@ def load_race(n):
         handi, _  = handi_rank.split()
         # h = int(handi.strip("m"))
         # pygame.draw.circle(screen,white,(start_position(h, n)),7)
-
-def set_start_potision(n):
-
-    pos = []
-    for racer in entry_datas[n-1]:
-        n, handi_rank = racer[0], racer[3]
-        handi, _ = handi_rank.split()
-        color = color_d[n]
-        pos.append((n, color, int(handi.strip("m"))))
-
-    return pos
 
 def get_racers(n):
     racers = []
@@ -114,51 +110,7 @@ def get_racers(n):
     
     return racers
 
-pygame.init()
-screen = pygame.display.set_mode((786, 730))
-font18 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 18)
-font14 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 14)
-ck = pygame.time.Clock()
-
-# screen.fill((220,213,200))
-screen.fill(sundance)
-pygame.display.set_caption(windows_title)
-# load_btn = pygame.Rect(300, 300, 80, 30)
-# load_text = font14.render("load", True, white)
-
-# start_btn = pygame.Rect(400, 300, 80, 30) 
-# start_text = font14.render("start", True, white)
-
-font = pygame.font.SysFont("arial", 16)
-font.set_bold(True) 
-
-# start_btn = pygame.Rect(200, 300, 80, 30)
-start_text = font.render("start", True, spunpearl)
-# screen.blit(button, (90+R, 350))
-# screen.blit(start_text, (90+R+13, 350+6))
-
-stop_text = font.render("stop", True, spunpearl)
-# screen.blit(button, (200+R, 350))
-# screen.blit(stop_text, (200+R+14, 350+6))
-
-goal_text = font.render("goal", True, spunpearl)
-# screen.blit(button, (310+R, 350))
-# screen.blit(goal_text, (310+R+14, 350+6))
-
-font12 = pygame.font.SysFont("arial", 12)
-race_texts =  [str(n).rjust(3, " ") + "R" for n in range(1,13)]
-race_fonts = [font12.render(r, True, (0,0,0)) for r in race_texts]
-x = 0
-for fnt in race_fonts:
-    pygame.draw.rect(screen, whisper, pygame.Rect(15+x, 6, 39, 21))
-    screen.blit(fnt, (20+x, 10))
-    x += 40
-
-btn_objs = [pygame.Rect(15+n*40, 6, 39, 21) for n in range(12)]
-
-### 初期画面
-load_race(1)
-StartPositions = set_start_potision(1)
+### rarara
 
 def start_acc(time):
     # 7秒間の加速 100m
@@ -171,37 +123,36 @@ def start_acc(time):
 
 # 3.3sec/100m ミリ秒に変換 3300ms circle 300m lines 100m x 2 16.5sec/500
 # 1m = 100ms  1m = 33ms 1m = 10ms
-def running(time, stime, ctime, handi, c): # c: 1, 2, 3, 4
-    # print(ctime, stime)
+def running(time, straighttime, cornertime, handi, c): # c: 1, 2, 3, 4
+    # print(cornertime, straighttime)
     line = []
     c = c * 10
-    for rad in np.linspace(np.pi/2, -np.pi/2, int(ctime*150)):
+    for rad in np.linspace(np.pi/2, -np.pi/2, int(cornertime*150)):
         x = (R+c) * np.cos(rad)
         y = (R+c) * np.sin(rad)
         line.append((x+100+R+300, y+230+6+100+R))
     del line[-1]
 
-    for px in np.linspace(400+R, 100+R, int(stime*100)):
+    for px in np.linspace(400+R, 100+R, int(straighttime*100)):
         x, y = px, 230+6+100-c
         line.append((x, y))
     del line[-1]
     # print(line[-2][0]-line[-1][0])
-    for rad in np.linspace(-np.pi/2, -np.pi*1.5, int(ctime*150)):
+    for rad in np.linspace(-np.pi/2, -np.pi*1.5, int(cornertime*150)):
         x = (R+c) * np.cos(rad)
         y = (R+c) * np.sin(rad)
         line.append((x+100+R, y+230+6+100+R))
     del line[-1]
 
-    for px in np.linspace(100+R, 400+R, int(stime*100)):
+    for px in np.linspace(100+R, 400+R, int(straighttime*100)):
         x, y = px, 230+6+100+D+c
         line.append((x, y))
     del line[-1]
 
     lines = []
     acc_x = start_acc(time)
-
     corner_x = acc_x[acc_x < handi + 10]
-    print("corner_", corner_x[-2], corner_x[-1])
+    # print("corner_", corner_x[-2], corner_x[-1])
     straight_x = acc_x[acc_x >= handi + 10]
 
     start_rad = np.radians(360 * (handi + 10)/300) + np.radians(90)
@@ -251,16 +202,69 @@ def get_cornertime(time, straighttime):
 
     return cornertime
 
-racers = get_racers(1)
-slow_time = max([racer[0] for racer in racers])
-straighttime = base_straighttime(slow_time)
-runs=[]
-for time, handi, c in racers:
-    cornertime = get_cornertime(time, straighttime)
-    lines = running(time, straighttime, cornertime, handi, c)
-    runs.append(lines)
+def set_racers(n):
+    racers = get_racers(1)
+    slow_time = max([racer[0] for racer in racers])
+    straighttime = base_straighttime(slow_time)
+    runs=[]
+    for time, handi, c in racers:
+        cornertime = get_cornertime(time, straighttime)
+        lines = running(time, straighttime, cornertime, handi, c)
+        runs.append(lines)
 
-handi_d = {1: 0, 2: 10, 3: 10, 4: 20, 5: 20, 6: 30, 7: 30, 8: 40}
+    return runs
+
+
+pygame.init()
+screen = pygame.display.set_mode((786, 730))
+font18 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 18)
+font14 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 14)
+ck = pygame.time.Clock()
+
+# screen.fill((220,213,200))
+screen.fill(sundance)
+pygame.display.set_caption(windows_title)
+# load_btn = pygame.Rect(300, 300, 80, 30)
+# load_text = font14.render("load", True, white)
+
+# start_btn = pygame.Rect(400, 300, 80, 30) 
+# start_text = font14.render("start", True, white)
+
+font = pygame.font.SysFont("arial", 16)
+font.set_bold(True) 
+
+# start_btn = pygame.Rect(200, 300, 80, 30)
+start_text = font.render("start", True, spunpearl)
+# screen.blit(button, (90+R, 350))
+# screen.blit(start_text, (90+R+13, 350+6))
+
+stop_text = font.render("stop", True, spunpearl)
+# screen.blit(button, (200+R, 350))
+# screen.blit(stop_text, (200+R+14, 350+6))
+
+goal_text = font.render("goal", True, spunpearl)
+# screen.blit(button, (310+R, 350))
+# screen.blit(goal_text, (310+R+14, 350+6))
+
+font12 = pygame.font.SysFont("arial", 12)
+race_texts =  [str(n).rjust(3, " ") + "R" for n in range(1,13)]
+race_fonts = [font12.render(r, True, (0,0,0)) for r in race_texts]
+x = 0
+for fnt in race_fonts:
+    pygame.draw.rect(screen, whisper, pygame.Rect(15+x, 6, 39, 21))
+    screen.blit(fnt, (20+x, 10))
+    x += 40
+
+btn_objs = [pygame.Rect(15+n*40, 6, 39, 21) for n in range(12)]
+
+### 初期画面
+load_race(1)
+StartPositions = set_start_potision(1)
+runs = set_racers(1)
+
+
+
+# handi_d = {1: 0, 2: 10, 3: 10, 4: 20, 5: 20, 6: 30, 7: 30, 8: 40}
 
 ### Game Tick
 OnYourMark = True
@@ -327,9 +331,11 @@ while True:
                 # pygame.draw.rect(screen, (255,0,0), btn_objs[1])
                 OnYourMark = True
                 StartPositions = set_start_potision(2)
+                runs = set_racers(2)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if btn_objs[2].collidepoint(event.pos):
                 load_race(3)
                 OnYourMark = True
                 StartPositions = set_start_potision(3)
+                runs = set_racers(3)
