@@ -2,11 +2,12 @@ import numpy as np
 import pickle
 import pygame
 from pygame.locals import QUIT
+import re
 import sys
 
 from course import course, D, R # 286.4788975654116, 143.2394487827058
 from equations import quadratic_equation
-from args import entry_data, entry
+from args import entry
 from buttons import button
 
 from simulation import simulate
@@ -15,6 +16,7 @@ sundance = 197,186,75 # background
 mintjulep = 225,217,162 # bg of racers info
 spunpearl = 162,162,173 # gray
 whisper = 232,232,232 # light gray
+oldrose = 201,60,89 # pink
 # racer
 white = 239,239,239 # White Smoke
 black = 7,6,2 # Maire
@@ -33,18 +35,21 @@ filename = args[1]
 with open(filename, mode="rb") as f:
     races = pickle.load(f)
 
+race_titles = []
 entries = []
 for race in races:
+    race_titles.append(race[0])
     entry_df = race[1]
     entry_data = entry(entry_df)
     entries.append(entry_data)
+
 
 def racer_render(entry):
 
     n, filename, name, rank, handi = entry[:5]
     trial, dev, mean_trial, mean_race, st, chakujun = entry[5:]
     
-    handi_rank = str(handi) + " " + rank
+    handi_rank = str(handi).rjust(3, " ") + "m " + rank
     trial_time = str(trial) + " " + str(dev)
     mean_time = str(mean_trial) + " " + str(mean_race)
     st_chakujun = str(st) + " " + chakujun
@@ -114,17 +119,12 @@ goal_text = font.render("goal", True, spunpearl)
 font12 = pygame.font.SysFont("arial", 12)
 race_texts =  [str(n).rjust(3, " ") + "R" for n in range(1,13)]
 race_fonts = [font12.render(r, True, (0,0,0)) for r in race_texts]
-# x = 0
-# for fnt in race_fonts:
-#     pygame.draw.rect(screen, whisper, pygame.Rect(15+x, 6, 39, 21))
-#     screen.blit(fnt, (20+x, 10))
-#     x += 40
 
-def spam(n):
+def raceboad(n):
     x = 0
     for idx, fnt in enumerate(race_fonts):
         if idx+1 == n:
-            pygame.draw.rect(screen, pink, pygame.Rect(15+x, 6, 39, 21))
+            pygame.draw.rect(screen, oldrose, pygame.Rect(15+x, 6, 39, 21))
         else:
             pygame.draw.rect(screen, whisper, pygame.Rect(15+x, 6, 39, 21))
         screen.blit(fnt, (20+x, 10))
@@ -133,8 +133,37 @@ def spam(n):
 btn_objs = [pygame.Rect(15+n*40, 6, 39, 21) for n in range(12)]
 
 ### 初期画面
-spam(1)
 lines, start_positions, goal_positions = load_race(1)
+raceboad(1)
+racetitle = race_titles[0]
+num = racetitle[2].strip("R")
+num_name = num.rjust(2, " ") + "R " + racetitle[3]
+title_text = font18.render(num_name, True, (0,0,0))
+
+weather_ground = racetitle[4] + " " + racetitle[5]
+wg_text = font14.render(weather_ground, True, (0,0,0))
+
+names = [entry[2] for entry in entries[0]]
+name_objs = [font14.render(str(i+1) + " " + name, True, (0,0,0)) for i, name in enumerate(names)]
+odds = races[0][2][0][0]["単勝オッズ"].tolist()
+odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
+
+def favorite_odds(n):
+    _quinella = races[n-1][2][1][2].astype("str").iloc[0,1:].tolist()
+    _exacta = races[n-1][2][2][2].astype("str").iloc[0,1:].tolist()
+    _trio = races[n-1][2][4][2].astype("str").iloc[0,1:].tolist()
+    _trifecta = races[n-1][2][5][2].astype("str").iloc[0,1:].tolist()
+    quinella = [re.sub("\xa0| ", "", s) for s in _quinella]
+    exacta = [re.sub("\xa0| ", "", s) for s in _exacta]
+    trio = [re.sub("\xa0| ", "", s) for s in _trio]
+    trifecta = [re.sub("\xa0| ", "", s) for s in _trifecta]
+    odds_sets = [quinella, exacta, trio, trifecta]
+    odds_items = [font14.render(ods[0], True, (0,0,0)) for ods in odds_sets]
+    odds_values = [font14.render(ods[1].rjust(6, " "), True, (0,0,0)) for ods in odds_sets]
+
+    return odds_items, odds_values
+
+odds_items, odds_values = favorite_odds(1)
 
 Set = True
 Start, Stop, Goal = False, False, False
@@ -143,6 +172,19 @@ while True:
     res = ck.tick_busy_loop(10) # 100ms 0.1sec
     # print(res)
     screen.blit(course, (0, 230+6), (0, 0, 786, 500))
+
+    screen.blit(title_text, (90+R, 350))
+    screen.blit(wg_text, (90+36+R, 378))
+    y=0
+    for name_text, odds_text in zip(name_objs, odds_objs):
+        screen.blit(name_text, (90+R, 405+y))
+        screen.blit(odds_text, (90+85+R, 405+y))
+        y += 20
+    y=0
+    for item_text, value_text in zip(odds_items, odds_values):
+        screen.blit(item_text, (90+150+R, 405+y))
+        screen.blit(value_text, (90+150+50+R, 405+y))
+        y += 20
 
     ybtn = 230
     start_button = pygame.Rect(90+R, 350+ybtn, 60, 30)
@@ -200,4 +242,21 @@ while True:
             for n in range(1, 13):
                 if btn_objs[n-1].collidepoint(event.pos):
                     lines, start_positions, goal_positions = load_race(n)
-                    spam(n)
+                    raceboad(n)
+                    Set = True
+                    Start, Stop, Goal = False, False, False
+                    
+                    racetitle = race_titles[n-1]
+                    num = racetitle[2].strip("R")
+                    txt = num.rjust(2, " ") + "R " + racetitle[3]
+                    title_text = font18.render(txt, True, (0,0,0))
+
+                    weather_ground = racetitle[4] + " " + racetitle[5]
+                    wg_text = font14.render(weather_ground, True, (0,0,0))
+
+                    names = [entry[2] for entry in entries[n-1]]
+                    name_objs = [font14.render(str(i+1) + " " + name, True, (0,0,0)) for i, name in enumerate(names)]
+                    odds = races[n-1][2][0][0]["単勝オッズ"].tolist()
+                    odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
+
+                    odds_items, odds_values = favorite_odds(n)
