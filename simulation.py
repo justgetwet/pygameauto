@@ -66,16 +66,24 @@ def running(n, time, basetime):
     for _ in range(5):
         lines += line
 
-    lines += line[:100]
-
     return lines
 
-def simulation(entries, r):
+def goalrun(n, s, time=3.9):
+    line = []
+    c = n * 10
+    for rad in np.linspace(np.pi/2, -np.pi/2, int(time*300)):
+        x = (R+c) * np.cos(rad)
+        y = (R+c) * np.sin(rad)
+        line.append((x+100+R+300, y+230+6+100+R))
+    
+    return line[:s]
 
-    n_data = [d[0] for d in entries[r-1]]
-    time_data = [d[8]  for d in entries[r-1]]
+def simulate(entry):
+
+    n_data = [d[0] for d in entry]
+    time_data = [d[8]  for d in entry]
     f = lambda x: np.radians(360 * x)/300 + np.radians(90)
-    handi_rads = [f(d[4]+10) for d in entries[r-1]] 
+    handi_rads = [f(d[4]+10) for d in entry] 
 
     acc_data = [start_acc(t) for t in time_data]
 
@@ -117,11 +125,28 @@ def simulation(entries, r):
         lines = running(n, time, basetime)
         arounds.append(lines)
 
-    lines = []
+    _lines = []
     for c, s, a in zip(corners, straights, arounds):
-        lines.append(c+s+a)
+        _lines.append(c+s+a)
+
+    l1 = [(idx+1, len(line)) for idx, line in enumerate(_lines)]
+    l2 = sorted(l1, key=lambda x: x[1])
+    l3 = [x[0] for x in l2]
+    l4 = [(x, (len(l2)+1-idx)*50) for idx, x in enumerate(l3)]
+    l5 = sorted(l4, key=lambda x: x[0])
+    goals=[]
+    for n, s in l5:
+        g = goalrun(n, s, basetime)
+        goals.append(g)
+
+    lines=[]
+    for line, goal in zip(_lines, goals):
+        line += goal
+        lines.append(line)
 
     return lines
+
+
 
 # rad = np.radians(90)
 # sx = (R+10) * np.cos(rad) + 100+R
@@ -143,7 +168,7 @@ if __name__ == '__main__':
         entry_data = entry(entry_df)
         entries.append(entry_data)
 
-    lines = simulation(entries, 1)
+    lines = simulate(entries, 3)
 
     pygame.init()
     ck = pygame.time.Clock()
