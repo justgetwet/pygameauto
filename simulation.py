@@ -28,9 +28,9 @@ def start_acc(time):
     # スタートの加速区間 7秒間 100m+α
     t = np.arange(0, 7, 0.01)
     v0, x0 = 5., 0.
-    a = round(11-(time-3.)*10, 1)
+    a = round(11-(time-3.)*10, 2)
     x = 1/2 * a * t**2 + t * v0 + x0
-    return x * 3
+    return x * 3, a
 
 def running(n, time, basetime): 
     # 周回区間
@@ -85,10 +85,12 @@ def simulate(entry):
     f = lambda x: np.radians(360 * x)/300 + np.radians(90)
     handi_rads = [f(d[4]+10) for d in entry] 
 
-    acc_data = [start_acc(t) for t in time_data]
+    start_accs = [start_acc(t) for t in time_data]
+    start_data = [s[0] for s in start_accs]
+    acc_data = [s[1] for s in start_accs]
 
     corners=[]
-    for n, acc, r in zip(n_data, acc_data, handi_rads):
+    for n, acc, r in zip(n_data, start_data, handi_rads):
         line=[]
         for px in acc:
             rad = r + np.radians(360 * -px/900)
@@ -102,7 +104,7 @@ def simulate(entry):
         corners.append(line)
 
     straights=[]
-    for n, acc in zip(n_data, acc_data):
+    for n, acc in zip(n_data, start_data):
         line=[]
         arr = np.array(acc[len(corners[n-1]):])
         acc_straight = arr - arr[0] 
@@ -144,7 +146,7 @@ def simulate(entry):
         line += goal
         lines.append(line)
 
-    return lines
+    return lines, acc_data
 
 
 

@@ -44,7 +44,7 @@ for race in races:
     entries.append(entry_data)
 
 
-def racer_render(entry):
+def racer_render(entry, a):
 
     n, filename, name, rank, handi = entry[:5]
     trial, dev, mean_trial, mean_race, st, chakujun = entry[5:]
@@ -53,6 +53,7 @@ def racer_render(entry):
     trial_time = str(trial) + " " + str(dev)
     mean_time = str(mean_trial) + " " + str(mean_race)
     st_chakujun = str(st) + " " + chakujun
+    acc_time = str(a) + " " + str(round(trial + dev, 3))
 
     x_d = {n: 15+96*(n-1) for n in range(1,9)}
     # color_d = {1: white, 2: black, 3: red, 4: blue, 5: yellow, 6: green, 7: orange, 8: pink}
@@ -81,22 +82,22 @@ def racer_render(entry):
     st_text = font14.render(st_chakujun, True, (0,0,0))
     screen.blit(st_text, (x+4, 212-30+14))
 
-    pred_text = font14.render("0.12 3.393", True, (0,0,0))
-    screen.blit(pred_text, (x+4, 230-30+14))
+    acc_text = font14.render(acc_time, True, (0,0,0))
+    screen.blit(acc_text, (x+4, 230-30+14))
 
 def load_race(n):
     # exec racer_render()
-    for entry in entries[n-1]:
-        racer_render(entry)
+    lines, acc = simulate(entries[n-1])
 
-    lines = simulate(entries[n-1])
+    for entry, a in zip(entries[n-1], acc):
+        racer_render(entry, a)
 
     start_positions, goal_positions = [], []
     for line in lines:
         start_positions.append(line[0])
         goal_positions.append(line[-1])
 
-    return lines, start_positions, goal_positions   
+    return lines, start_positions, goal_positions
 
 windows_title = " ".join(races[0][0][:2])
 
