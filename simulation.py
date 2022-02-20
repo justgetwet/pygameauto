@@ -28,7 +28,7 @@ def start_acc(time):
     # スタートの加速区間 7秒間 100m+α
     t = np.arange(0, 7, 0.01)
     v0, x0 = 5., 0.
-    a = round(11-(time-3.)*10, 2)
+    a = 11-(time-3.)*10
     x = 1/2 * a * t**2 + t * v0 + x0
     return x * 3, a
 
@@ -43,22 +43,22 @@ def running(n, time, basetime):
     for rad in np.linspace(np.pi/2, -np.pi/2, int(cornertime*300)):
         x = (R+c) * np.cos(rad)
         y = (R+c) * np.sin(rad)
-        line.append((x+100+R+300, y+230+6+100+R))
+        line.append((x+100+R+300, y+230+6+100+18+R))
     del line[-1]
 
     for px in np.linspace(400+R, 100+R, int(basetime*100)):
-        x, y = px, 230+6+100-c
+        x, y = px, 230+6+100+18-c
         line.append((x, y))
     del line[-1]
     # print(line[-2][0]-line[-1][0])
     for rad in np.linspace(-np.pi/2, -np.pi*1.5, int(cornertime*300)):
         x = (R+c) * np.cos(rad)
         y = (R+c) * np.sin(rad)
-        line.append((x+100+R, y+230+6+100+R))
+        line.append((x+100+R, y+230+6+100+18+R))
     del line[-1]
 
     for px in np.linspace(100+R, 400+R, int(basetime*100)):
-        x, y = px, 230+6+100+D+c
+        x, y = px, 230+6+100+18+D+c
         line.append((x, y))
     del line[-1]
 
@@ -74,16 +74,16 @@ def goalrun(n, s, time=3.9):
     for rad in np.linspace(np.pi/2, -np.pi/2, int(time*300)):
         x = (R+c) * np.cos(rad)
         y = (R+c) * np.sin(rad)
-        line.append((x+100+R+300, y+230+6+100+R))
+        line.append((x+100+R+300, y+230+6+100+18+R))
     
     return line[:s]
 
 def simulate(entry):
 
-    n_data = [d[0] for d in entry]
-    time_data = [d[8]  for d in entry]
+    n_data = [int(d[0]) for d in entry]
+    time_data = [float(d[8])  for d in entry]
     f = lambda x: np.radians(360 * x)/300 + np.radians(90)
-    handi_rads = [f(d[4]+10) for d in entry] 
+    handi_rads = [f(int(d[7].strip("m"))+10) for d in entry] 
 
     start_accs = [start_acc(t) for t in time_data]
     start_data = [s[0] for s in start_accs]
@@ -98,7 +98,7 @@ def simulate(entry):
                 c = 10 * n
                 x = (R+c) * np.cos(rad)
                 y = (R+c) * np.sin(rad)
-                line.append((x+100+R, y+100+230+6+R))
+                line.append((x+100+R, y+100+230+6+18+R))
             else:
                 break
         corners.append(line)
@@ -111,7 +111,7 @@ def simulate(entry):
         for px in acc_straight:
             if px < 300:
                 c = 10 * n
-                x, y = px+100+R, 230+100+6+D+c
+                x, y = px+100+R, 230+100+6+18+D+c
                 line.append((x, y))
             else:
                 break

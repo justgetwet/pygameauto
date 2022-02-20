@@ -46,14 +46,14 @@ for race in races:
 
 def racer_render(entry, a):
 
-    n, filename, name, rank, handi = entry[:5]
-    trial, dev, mean_trial, mean_race, st, chakujun = entry[5:]
+    n, filename, name, gradu, machine, team, rank, handi = entry[:8]
+    trial, dev, mean_trial, mean_time, mean_st = entry[8:]
     
-    handi_rank = str(handi).rjust(3, " ") + "m " + rank
-    trial_time = str(trial) + " " + str(dev)
-    mean_time = str(mean_trial) + " " + str(mean_race)
-    st_chakujun = str(st) + " " + chakujun
-    acc_time = str(a) + " " + str(round(trial + dev, 3))
+    handi_rank = handi.rjust(4, " ") + " " + rank
+    trial_time = trial + " " + dev
+    mean_time = mean_trial + " " + mean_time
+    st_chakujun = mean_st + " " + str(round(float(trial) + float(dev), 3))
+    acc_time = str(round(a, 1)) + "  "  + str(round(float(trial) + float(dev), 3))
 
     x_d = {n: 15+96*(n-1) for n in range(1,9)}
     # color_d = {1: white, 2: black, 3: red, 4: blue, 5: yellow, 6: green, 7: orange, 8: pink}
@@ -64,26 +64,35 @@ def racer_render(entry, a):
     img = pygame.image.load(p)
     img_scaled = pygame.transform.scale(img, (86, 86))
     screen.blit(img_scaled, (x, 50+14-30))
-    pygame.draw.rect(screen, mintjulep, (x, 106+14, 86, 116))
+    pygame.draw.rect(screen, mintjulep, (x, 106+14, 86, 116+18))
     pygame.draw.rect(screen, color, (x+2, 106+14, 6, 21))
     
+    team_text = font14.render(team[0], True, (0,0,0))
+    screen.blit(team_text, (x+3, 50-30+14))
+
+    gradu_text = font14.render(gradu, True, (0,0,0))
+    screen.blit(gradu_text, (x+70, 50-30+14))
+
     name_text = font14.render(name, True, (0,0,0))
     screen.blit(name_text, (x+10, 140-30+14))
     
+    machine_text = font12RD.render(machine, True, (0,0,0))
+    screen.blit(machine_text, (x+4, 158-30+14+1))
+
     rank_text = font14.render(handi_rank, True, (0,0,0))
-    screen.blit(rank_text, (x+4, 158-30+14))
+    screen.blit(rank_text, (x+4, 158-30+14+18))
     
     trial_text = font14.render(trial_time, True, (0,0,0))
-    screen.blit(trial_text, (x+4, 176-30+14))
+    screen.blit(trial_text, (x+4, 176-30+14+18))
     
     mean_text = font14.render(mean_time, True, (0,0,0))
-    screen.blit(mean_text, (x+4, 194-30+14))
+    screen.blit(mean_text, (x+4, 194-30+14+18))
 
     st_text = font14.render(st_chakujun, True, (0,0,0))
-    screen.blit(st_text, (x+4, 212-30+14))
+    screen.blit(st_text, (x+4, 212-30+14+18))
 
     acc_text = font14.render(acc_time, True, (0,0,0))
-    screen.blit(acc_text, (x+4, 230-30+14))
+    screen.blit(acc_text, (x+4, 230-30+14+18))
 
 def load_race(n):
     # exec racer_render()
@@ -102,9 +111,10 @@ def load_race(n):
 windows_title = " ".join(races[0][0][:2])
 
 pygame.init()
-screen = pygame.display.set_mode((786, 730))
+screen = pygame.display.set_mode((786, 730+18))
 font18 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 18)
 font14 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 14)
+font12RD = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 12)
 ck = pygame.time.Clock()
 
 # screen.fill((220,213,200))
@@ -172,22 +182,22 @@ t = 0
 while True:
     res = ck.tick_busy_loop(10) # 100ms 0.1sec
     # print(res)
-    screen.blit(course, (0, 230+6), (0, 0, 786, 500))
+    screen.blit(course, (0, 230+6+18), (0, 0, 786, 500+18))
 
-    screen.blit(title_text, (90+R, 350))
-    screen.blit(wg_text, (90+36+R, 378))
+    screen.blit(title_text, (90+R, 350+18))
+    screen.blit(wg_text, (90+36+R, 378+18))
     y=0
     for name_text, odds_text in zip(name_objs, odds_objs):
-        screen.blit(name_text, (90+R, 405+y))
-        screen.blit(odds_text, (90+85+R, 405+y))
+        screen.blit(name_text, (90+R, 405+18+y))
+        screen.blit(odds_text, (90+85+R, 405+18+y))
         y += 20
     y=0
     for item_text, value_text in zip(odds_items, odds_values):
-        screen.blit(item_text, (90+150+R, 405+y))
-        screen.blit(value_text, (90+150+50+R, 405+y))
+        screen.blit(item_text, (90+150+R, 405+18+y))
+        screen.blit(value_text, (90+150+50+R, 405+18+y))
         y += 20
 
-    ybtn = 230
+    ybtn = 230 + 18
     start_button = pygame.Rect(90+R, 350+ybtn, 60, 30)
     screen.blit(button, (90+R, 350+ybtn))
     screen.blit(start_text, (90+R+13, 350+ybtn+6))

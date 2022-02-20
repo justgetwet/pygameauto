@@ -8,7 +8,7 @@ sundance = 197,186,75 # background
 spunpearl = 162,162,173 # gray
 freespeech = 75,86,197 # blue
 
-im = Image.new('RGBA', (786, 500), (220,213,200,0))
+im = Image.new('RGBA', (786, 500+18), (220,213,200,0))
 draw = ImageDraw.Draw(im)
 D = 900 / np.pi # 直径 286.4788975654116
 R = (900 / np.pi ) / 2 # 半径 143.2394487827058
