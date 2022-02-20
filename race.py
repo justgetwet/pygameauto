@@ -38,10 +38,11 @@ with open(filename, mode="rb") as f:
 race_titles = []
 entries = []
 for race in races:
-    race_titles.append(race[0])
-    entry_df = race[1]
-    entry_data = entry(entry_df)
-    entries.append(entry_data)
+    if race:
+        race_titles.append(race[0])
+        entry_df = race[1]
+        entry_data = entry(entry_df)
+        entries.append(entry_data)
 
 
 def racer_render(entry, a):
@@ -128,7 +129,7 @@ stop_text = font.render("stop", True, spunpearl)
 goal_text = font.render("goal", True, spunpearl)
 
 font12 = pygame.font.SysFont("arial", 12)
-race_texts =  [str(n).rjust(3, " ") + "R" for n in range(1,13)]
+race_texts =  [str(n).rjust(3, " ") + "R" for n in range(1,len(entries)+1)]
 race_fonts = [font12.render(r, True, (0,0,0)) for r in race_texts]
 
 def raceboad(n):
@@ -163,12 +164,16 @@ def favorite_odds(n):
     _quinella = races[n-1][2][1][2].astype("str").iloc[0,1:].tolist()
     _exacta = races[n-1][2][2][2].astype("str").iloc[0,1:].tolist()
     _trio = races[n-1][2][4][2].astype("str").iloc[0,1:].tolist()
-    _trifecta = races[n-1][2][5][2].astype("str").iloc[0,1:].tolist()
+    _trifecta1 = races[n-1][2][5][2].astype("str").iloc[0,1:].tolist()
+    _trifecta2 = races[n-1][2][5][2].astype("str").iloc[1,1:].tolist()
+    _trifecta3 = races[n-1][2][5][2].astype("str").iloc[2,1:].tolist()
     quinella = [re.sub("\xa0| ", "", s) for s in _quinella]
     exacta = [re.sub("\xa0| ", "", s) for s in _exacta]
     trio = [re.sub("\xa0| ", "", s) for s in _trio]
-    trifecta = [re.sub("\xa0| ", "", s) for s in _trifecta]
-    odds_sets = [quinella, exacta, trio, trifecta]
+    trifecta1 = [re.sub("\xa0| ", "", s) for s in _trifecta1]
+    trifecta2 = [re.sub("\xa0| ", "", s) for s in _trifecta2]
+    trifecta3 = [re.sub("\xa0| ", "", s) for s in _trifecta3]
+    odds_sets = [quinella, exacta, trio, trifecta1, trifecta2, trifecta3]
     odds_items = [font14.render(ods[0], True, (0,0,0)) for ods in odds_sets]
     odds_values = [font14.render(ods[1].rjust(6, " "), True, (0,0,0)) for ods in odds_sets]
 
@@ -250,7 +255,7 @@ while True:
                 Goal = True 
                 Set, Start, Stop = False, False, False
 
-            for n in range(1, 13):
+            for n in range(1, len(entries)+1):
                 if btn_objs[n-1].collidepoint(event.pos):
                     lines, start_positions, goal_positions = load_race(n)
                     raceboad(n)
