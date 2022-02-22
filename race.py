@@ -1,3 +1,4 @@
+from turtle import update
 import numpy as np
 import pickle
 import pygame
@@ -6,8 +7,8 @@ import re
 import sys
 
 from course import course, D, R # 286.4788975654116, 143.2394487827058
-from equations import quadratic_equation
-from args import entry
+from scrape_oneday_favodds import odds_update
+from args import set_entry
 from buttons import button
 
 from simulation import simulate
@@ -28,6 +29,7 @@ orange = 200,122,50 # Bronze
 pink = 177,102,182 # Fuchsia
 
 color_d = {1: white, 2: black, 3: red, 4: blue, 5: yellow, 6: green, 7: orange, 8: pink}
+place_d = {"kawaguchi": "川口", "isesaki": "伊勢崎", "hamamatsu": "浜松", "iizuka": "飯塚", "sanyo": "山陽"}
 
 args = sys.argv 
 
@@ -35,13 +37,17 @@ filename = args[1]
 with open(filename, mode="rb") as f:
     races = pickle.load(f)
 
+res = filename.split("\\")
+dt, place_en, _ = res[2].split("_")
+place = place_d[place_en]
+
 race_titles = []
 entries = []
 for race in races:
     if race:
         race_titles.append(race[0])
         entry_df = race[1]
-        entry_data = entry(entry_df)
+        entry_data = set_entry(entry_df)
         entries.append(entry_data)
 
 
@@ -53,8 +59,11 @@ def racer_render(entry, a):
     handi_rank = handi.rjust(4, " ") + " " + rank
     trial_time = trial + " " + dev
     mean_time = mean_trial + " " + mean_time
-    st_chakujun = mean_st + " " + str(round(float(trial) + float(dev), 3))
-    acc_time = str(round(a, 1)) + "  "  + str(round(float(trial) + float(dev), 3))
+    if trial == "-":
+        trial_time, st_trialplusdev, acc_time = "", mean_st, ""
+    else:
+        st_trialplusdev = mean_st + " " + str(round(float(trial) + float(dev), 3))
+        acc_time = str(round(a, 1)) + "  "  + str(round(float(trial) + float(dev), 3))
 
     x_d = {n: 15+96*(n-1) for n in range(1,9)}
     # color_d = {1: white, 2: black, 3: red, 4: blue, 5: yellow, 6: green, 7: orange, 8: pink}
@@ -89,7 +98,7 @@ def racer_render(entry, a):
     mean_text = font14.render(mean_time, True, (0,0,0))
     screen.blit(mean_text, (x+4, 194-30+14+18))
 
-    st_text = font14.render(st_chakujun, True, (0,0,0))
+    st_text = font14.render(st_trialplusdev, True, (0,0,0))
     screen.blit(st_text, (x+4, 212-30+14+18))
 
     acc_text = font14.render(acc_time, True, (0,0,0))
@@ -108,6 +117,27 @@ def load_race(n):
         goal_positions.append(line[-1])
 
     return lines, start_positions, goal_positions
+
+update_data = []
+
+def update_trial():
+    x_d = {n: 15+96*(n-1) for n in range(1,9)}
+    if update_data:
+        entry_df = update_data[0]
+        racers = set_entry(entry_df)
+        for i, racer in enumerate(racers):
+            trial, dev, mean_st = racer[8], racer[9], racer[12]
+            if trial == "=":
+                print("no trial data.")
+            else:
+                trial_time = trial + " " + dev
+                st_trialplusdev = mean_st + " " + str(round(float(trial) + float(dev), 3))
+                st_text = font14.render(st_trialplusdev, True, (0,0,0))
+                trial_text = font14.render(trial_time, True, (0,0,0))
+                x = x_d[i+1]
+                # print(x)
+                screen.blit(trial_text, (x+4, 176-30+14+18))
+                screen.blit(st_text, (x+4, 212-30+14+18))
 
 windows_title = " ".join(races[0][0][:2])
 
@@ -152,13 +182,11 @@ num = racetitle[2].strip("R")
 num_name = num.rjust(2, " ") + "R " + racetitle[3]
 title_text = font18.render(num_name, True, (0,0,0))
 
-weather_ground = racetitle[4] + " " + racetitle[5]
+weather_ground = racetitle[4] + " " + racetitle[5] + " " + racetitle[6]
 wg_text = font14.render(weather_ground, True, (0,0,0))
 
 names = [entry[2] for entry in entries[0]]
 name_objs = [font14.render(str(i+1) + " " + name, True, (0,0,0)) for i, name in enumerate(names)]
-odds = races[0][2][0][0]["単勝オッズ"].tolist()
-odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
 
 def favorite_odds(n):
     _quinella = races[n-1][2][1][2].astype("str").iloc[0,1:].tolist()
@@ -179,10 +207,41 @@ def favorite_odds(n):
 
     return odds_items, odds_values
 
-odds_items, odds_values = favorite_odds(1)
+def update_odds():
+    if update_data:
+        odds = update_data[1][0][0]["単勝オッズ"].tolist()
+        odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
+        
+        _quinella = update_data[1][1][2].astype("str").iloc[0,1:].tolist()
+        _exacta = update_data[1][2][2].astype("str").iloc[0,1:].tolist()
+        _trio = update_data[1][4][2].astype("str").iloc[0,1:].tolist()
+        _trifecta1 = update_data[1][5][2].astype("str").iloc[0,1:].tolist()
+        _trifecta2 = update_data[1][5][2].astype("str").iloc[1,1:].tolist()
+        _trifecta3 = update_data[1][5][2].astype("str").iloc[2,1:].tolist()
+        quinella = [re.sub("\xa0| ", "", s) for s in _quinella]
+        exacta = [re.sub("\xa0| ", "", s) for s in _exacta]
+        trio = [re.sub("\xa0| ", "", s) for s in _trio]
+        trifecta1 = [re.sub("\xa0| ", "", s) for s in _trifecta1]
+        trifecta2 = [re.sub("\xa0| ", "", s) for s in _trifecta2]
+        trifecta3 = [re.sub("\xa0| ", "", s) for s in _trifecta3]
+        odds_sets = [quinella, exacta, trio, trifecta1, trifecta2, trifecta3]
+        odds_items = [font14.render(ods[0], True, (0,0,0)) for ods in odds_sets]
+        odds_values = [font14.render(ods[1].rjust(6, " "), True, (0,0,0)) for ods in odds_sets]
+
+    return odds_objs, odds_items, odds_values
+
+if races[0][2][0] == []:
+    odds_objs = [font14.render("", True, (0,0,0)) for _ in range(len(entries))]
+    odds_items = [font14.render("", True, (0,0,0))]
+    odds_values = [font14.render("", True, (0,0,0))]
+else:
+    odds = races[0][2][0][0]["単勝オッズ"].tolist()
+    odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
+    odds_items, odds_values = favorite_odds(1)
 
 Set = True
 Start, Stop, Goal = False, False, False
+this_race = 1
 t = 0
 while True:
     res = ck.tick_busy_loop(10) # 100ms 0.1sec
@@ -198,8 +257,8 @@ while True:
         y += 20
     y=0
     for item_text, value_text in zip(odds_items, odds_values):
-        screen.blit(item_text, (90+150+R, 405+18+y))
-        screen.blit(value_text, (90+150+50+R, 405+18+y))
+        screen.blit(item_text, (90+150-10+R, 405+18+y))
+        screen.blit(value_text, (90+150-10+50+R, 405+18+y))
         y += 20
 
     ybtn = 230 + 18
@@ -214,6 +273,10 @@ while True:
     goal_button = pygame.Rect(310+R, 350+ybtn, 60, 30)
     screen.blit(button, (310+R, 350+ybtn))
     screen.blit(goal_text, (310+R+14, 350+ybtn+6))
+
+    update_button = pygame.Rect(400+R, 350+ybtn, 60, 30)
+    screen.blit(button, (400+R, 350+ybtn))
+    screen.blit(goal_text, (400+R+14, 350+ybtn+6))
 
     if Set:
         for idx, p in enumerate(start_positions):
@@ -255,8 +318,15 @@ while True:
                 Goal = True 
                 Set, Start, Stop = False, False, False
 
+            if update_button.collidepoint(event.pos):
+                update_data = odds_update(dt, place, this_race)
+                odds_objs, odds_items, odds_values = update_odds()
+                update_trial()
+                # lines, start_positions, goal_positions = update_race(int(this_race))
+
             for n in range(1, len(entries)+1):
                 if btn_objs[n-1].collidepoint(event.pos):
+                    this_race = n
                     lines, start_positions, goal_positions = load_race(n)
                     raceboad(n)
                     Set = True
@@ -267,12 +337,17 @@ while True:
                     txt = num.rjust(2, " ") + "R " + racetitle[3]
                     title_text = font18.render(txt, True, (0,0,0))
 
-                    weather_ground = racetitle[4] + " " + racetitle[5]
+                    weather_ground = racetitle[4] + " " + racetitle[5] + " " + racetitle[6]
                     wg_text = font14.render(weather_ground, True, (0,0,0))
 
                     names = [entry[2] for entry in entries[n-1]]
                     name_objs = [font14.render(str(i+1) + " " + name, True, (0,0,0)) for i, name in enumerate(names)]
-                    odds = races[n-1][2][0][0]["単勝オッズ"].tolist()
-                    odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
-
-                    odds_items, odds_values = favorite_odds(n)
+                    
+                    if races[n-1][2][0] == []:
+                        odds_objs = [font14.render("", True, (0,0,0)) for _ in range(len(entries))]
+                        odds_items = [font14.render("", True, (0,0,0))]
+                        odds_values = [font14.render("", True, (0,0,0))]
+                    else:
+                        odds = races[n-1][2][0][0]["単勝オッズ"].tolist()
+                        odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
+                        odds_items, odds_values = favorite_odds(n)

@@ -34,8 +34,13 @@ def get_meta(dt, place, entry_url):
     dsc = re.sub("\xa0", "", tag.text.strip())
     meta += [r, dsc]
     tags = soup.select("#RCdata2 .RCdst")
-    items = tags[0].text.split()
-    meta += [item for item in items if item.startswith("天候") or item.startswith("走路状況")]
+    if tags:
+        items = tags[0].text.split()
+        meta += [item for item in items if item.startswith("天候") or item.startswith("走路状況")]
+        start_time = soup.select_one(".RCstm").text
+        meta += [start_time]
+    else:
+        meta += ["", "", ""]
 
     return meta
 
@@ -76,11 +81,42 @@ def onerace(dt, place, raceNo):
     return [meta, entry_df, odds, result_dfs]
 
 
+def odds_update(dt, place, raceNo):
+
+    place_cd = placeCd_d[place]
+    race_url = f"raceDy={dt}&placeCd={place_cd}&raceNo={raceNo}"
+
+    entry_url = url_oddspark + "/RaceList.do?" + race_url
+
+    win_place_url = url_oddspark + "/Odds.do?" + race_url + "&betType=1&viewType=0"
+    quinella_url = url_oddspark + "/Odds.do?" + race_url + "&betType=6&viewType=1"
+    exacta_url = url_oddspark + "/Odds.do?" + race_url + "&betType=5&viewType=1"
+    wide_url = url_oddspark + "/Odds.do?" + race_url + "&betType=7&viewType=1"
+    trio_url = url_oddspark + "/Odds.do?" + race_url +  "&betType=9&viewType=1" 
+    trifecta_url = url_oddspark + "/Odds.do?" + race_url + "&betType=8&viewType=1"
+    odds_urls = [win_place_url, quinella_url, exacta_url, wide_url, trio_url, trifecta_url]
+
+    dfs = get_dfs(entry_url)
+    if dfs:
+        entry_df = dfs[-1]
+        # bikes = list(map(lambda x: str(x), range(1, len(entry_df)+1)))
+    else:
+        print("no entry!")
+        return []
+
+    odds = []
+    for url in odds_urls:
+        dfs = get_dfs(url)
+        odds.append(dfs)
+    print("odds updated.")
+
+    return [entry_df, odds]
+
 if __name__=='__main__':
 
     # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220206"
-    place = "伊勢崎"
+    dt = "20220223"
+    place = "川口"
     races = []
     for raceNo in [str(n) for n in range(1,13)]:
         start = time.time()

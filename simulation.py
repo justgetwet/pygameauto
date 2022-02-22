@@ -6,7 +6,7 @@ from pygame.locals import QUIT, KEYDOWN, K_s
 import sys
 
 from course import course, D, R # 286.4788975654116, 143.2394487827058
-from args import entry
+from args import set_entry
 
 sundance = 197,186,75 # background
 mintjulep = 225,217,162 # bg of racers info
@@ -81,7 +81,10 @@ def goalrun(n, s, time=3.9):
 def simulate(entry):
 
     n_data = [int(d[0]) for d in entry]
-    time_data = [float(d[8])  for d in entry]
+    if entry[0][8] == "-":
+        time_data = [float(d[11])  for d in entry]
+    else:
+        time_data = [float(d[8])+float(d[9])  for d in entry]
     f = lambda x: np.radians(360 * x)/300 + np.radians(90)
     handi_rads = [f(int(d[7].strip("m"))+10) for d in entry] 
 
@@ -167,7 +170,7 @@ if __name__ == '__main__':
     entries = []
     for race in races:
         entry_df = race[1]
-        entry_data = entry(entry_df)
+        entry_data = set_entry(entry_df)
         entries.append(entry_data)
 
     lines = simulate(entries, 3)

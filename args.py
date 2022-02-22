@@ -26,7 +26,7 @@ def new_entry_df(entry_df):
 
     return pd.DataFrame(rows, columns=col)
 
-def entry(entry_df):
+def set_entry(entry_df):
     racers = []
     for racer in  entry_df.iloc[:,:].values:
         no = racer[0]
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     for race in races:
         entry_df = race[1]
-        ret = entry(entry_df)
+        ret = set_entry(entry_df)
         print(ret)
 
 
