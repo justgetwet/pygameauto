@@ -18,6 +18,8 @@ mintjulep = 225,217,162 # bg of racers info
 spunpearl = 162,162,173 # gray
 whisper = 232,232,232 # light gray
 oldrose = 201,60,89 # pink
+
+nero = 26,26,26
 # racer
 white = 239,239,239 # White Smoke
 black = 7,6,2 # Maire
@@ -89,19 +91,19 @@ def racer_render(entry, a):
     machine_text = font12RD.render(machine, True, (0,0,0))
     screen.blit(machine_text, (x+4, 158-30+14+1))
 
-    rank_text = font14.render(handi_rank, True, (0,0,0))
+    rank_text = font14.render(handi_rank, True, nero)
     screen.blit(rank_text, (x+4, 158-30+14+18))
     
     trial_text = font14.render(trial_time, True, (0,0,0))
     screen.blit(trial_text, (x+4, 176-30+14+18))
     
-    mean_text = font14.render(mean_time, True, (0,0,0))
+    mean_text = font14.render(mean_time, True, nero)
     screen.blit(mean_text, (x+4, 194-30+14+18))
 
     st_text = font14.render(st_trialplusdev, True, (0,0,0))
     screen.blit(st_text, (x+4, 212-30+14+18))
 
-    acc_text = font14.render(acc_time, True, (0,0,0))
+    acc_text = font14.render(acc_time, True, nero)
     screen.blit(acc_text, (x+4, 230-30+14+18))
 
 def load_race(n):
