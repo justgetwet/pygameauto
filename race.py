@@ -129,7 +129,7 @@ def update_trial():
         racers = set_entry(entry_df)
         for i, racer in enumerate(racers):
             trial, dev, mean_st = racer[8], racer[9], racer[12]
-            if trial == "=":
+            if trial == "-":
                 print("no trial data.")
             else:
                 trial_time = trial + " " + dev

@@ -3,6 +3,8 @@ import pandas as pd
 import warnings
 warnings.simplefilter('ignore', category=RuntimeWarning)
 
+from scrape_onerace_fullodds import onerace
+
 def odds_d(race):
     win_df = race[2][0][0]
     quin_df = race[2][1][-1]
@@ -50,18 +52,18 @@ def oddswin(race):
     df = pd.DataFrame(srs)
     syn, syn2, syn3, syn4 = [], [], [], []
     for i in range(len(idx)):
-        arr = df.iloc[i, :].values
-        nonan_list = arr[~np.isnan(arr)]
-        a = [n for n in nonan_list if n != 0.]
-        aall = np.array(a)
+        arr = df.iloc[:, i].values
+        nonans = arr[~np.isnan(arr)]
+        a = [n for n in nonans if n != 0.]
+        a_all = np.array(a)
         a2 = np.array(sorted(a)[:2])
         a3 = np.array(sorted(a)[:3])
         a4 = np.array(sorted(a)[:4])
-        oall = 1/(1/aall).sum()
+        o_all = 1/(1/a_all).sum()
         o2 = 1/(1/a2).sum()
         o3 = 1/(1/a3).sum()
         o4 = 1/(1/a4).sum()
-        syn.append(round(oall, 1))
+        syn.append(round(o_all, 1))
         syn2.append(round(o2, 1))
         syn3.append(round(o3, 1))
         syn4.append(round(o4, 1))
@@ -74,3 +76,9 @@ def oddswin(race):
     df = pd.concat(data, axis=1)
 
     return df
+
+if __name__ == '__main__':
+
+    race = onerace("20220227", "川口", "12")
+    df = oddswin(race)
+    print(df)
