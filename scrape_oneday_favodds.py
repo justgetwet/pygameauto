@@ -7,6 +7,8 @@ import re
 import requests
 import time
 
+from pred import pred30
+
 url_oddspark = "https://www.oddspark.com/autorace"
 
 placeCd_d = {'川口': '02', '伊勢崎': '03', '浜松': '04', '飯塚': '05', '山陽': '06'}
@@ -69,6 +71,8 @@ def onerace(dt, place, raceNo):
         print("no entry!")
         return []
 
+    pred = pred30(entry_df)
+
     meta = get_meta(dt, place, entry_url)
 
     odds = []
@@ -78,7 +82,7 @@ def onerace(dt, place, raceNo):
     
     result_dfs = get_dfs(result_url)
 
-    return [meta, entry_df, odds, result_dfs]
+    return [meta, entry_df, odds, pred, result_dfs]
 
 
 def odds_update(dt, place, raceNo):
@@ -115,8 +119,8 @@ def odds_update(dt, place, raceNo):
 if __name__=='__main__':
 
     # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220228"
-    place = "川口"
+    dt = "20220306"
+    place = "伊勢崎"
     races = []
     for raceNo in [str(n) for n in range(1,13)]:
         start = time.time()

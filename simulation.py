@@ -6,7 +6,7 @@ from pygame.locals import QUIT, KEYDOWN, K_s
 import sys
 
 from course import course, D, R # 286.4788975654116, 143.2394487827058
-from args import set_entry
+from entries4pygame import set_entry
 
 sundance = 197,186,75 # background
 mintjulep = 225,217,162 # bg of racers info

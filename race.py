@@ -1,4 +1,4 @@
-from turtle import update
+# from turtle import update
 import numpy as np
 import pickle
 import pygame
@@ -8,7 +8,7 @@ import sys
 
 from course import course, D, R # 286.4788975654116, 143.2394487827058
 from scrape_oneday_favodds import odds_update
-from args import set_entry
+from entries4pygame import set_entry
 from buttons import button
 
 from simulation import simulate
