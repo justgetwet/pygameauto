@@ -34,7 +34,10 @@ def start_acc(time):
 
 def running(n, time, basetime): 
     # 周回区間
-    around_course_time = time * 5
+    if time != 0.0:
+        around_course_time = time * 5
+    else: # 休場明けをどうしよう
+        around_course_time = 3.6 * 5
     straighttime = basetime * 2
     cornertime = (around_course_time - straighttime) / 3 # per 100m
     

@@ -39,21 +39,24 @@ filename = args[1]
 with open(filename, mode="rb") as f:
     races = pickle.load(f)
 
-res = filename.split("\\")
-dt, place_en, _ = res[2].split("_")
+# res = filename.strip("./data/")
+res = filename.strip(".\\data")
+dt, place_en, _ = res.split("_")
 place = place_d[place_en]
 
 race_titles = []
 entries = []
+montes = []
 for race in races:
     if race:
         race_titles.append(race[0])
         entry_df = race[1]
         entry_data = set_entry(entry_df)
         entries.append(entry_data)
-
+        montes.append(race[3]) 
 
 def racer_render(entry, a):
+
 
     n, filename, name, gradu, machine, team, rank, handi = entry[:8]
     trial, dev, mean_trial, mean_time, mean_st = entry[8:]
@@ -148,17 +151,24 @@ screen = pygame.display.set_mode((786, 730+18))
 font18 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 18)
 font14 = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 14)
 font12RD = pygame.font.Font("./fonts/RictyDiminished-Regular.ttf", 12)
-ck = pygame.time.Clock()
+ck = pygame.time.Clock()  
 
 # screen.fill((220,213,200))
 screen.fill(sundance)
 pygame.display.set_caption(windows_title)
 
+mainSurface = pygame.Surface((786, 223))
+mainSurface.fill(sundance)    
+screen.blit(mainSurface, (0, 32)) 
+
 font = pygame.font.SysFont("arial", 16)
+font15 = pygame.font.SysFont("arial", 15)
 font.set_bold(True) 
+font15.set_bold(True)
 start_text = font.render("start", True, spunpearl)
 stop_text = font.render("stop", True, spunpearl)
 goal_text = font.render("goal", True, spunpearl)
+update_text = font15.render("update", True, spunpearl)
 
 font12 = pygame.font.SysFont("arial", 12)
 race_texts =  [str(n).rjust(3, " ") + "R" for n in range(1,len(entries)+1)]
@@ -192,18 +202,22 @@ name_objs = [font14.render(str(i+1) + " " + name, True, (0,0,0)) for i, name in 
 
 def favorite_odds(n):
     _quinella = races[n-1][2][1][2].astype("str").iloc[0,1:].tolist()
-    _exacta = races[n-1][2][2][2].astype("str").iloc[0,1:].tolist()
+    _exacta1 = races[n-1][2][2][2].astype("str").iloc[0,1:].tolist()
+    _exacta2 = races[n-1][2][2][2].astype("str").iloc[1,1:].tolist()
+    _exacta3 = races[n-1][2][2][2].astype("str").iloc[2,1:].tolist()
     _trio = races[n-1][2][4][2].astype("str").iloc[0,1:].tolist()
     _trifecta1 = races[n-1][2][5][2].astype("str").iloc[0,1:].tolist()
     _trifecta2 = races[n-1][2][5][2].astype("str").iloc[1,1:].tolist()
     _trifecta3 = races[n-1][2][5][2].astype("str").iloc[2,1:].tolist()
     quinella = [re.sub("\xa0| ", "", s) for s in _quinella]
-    exacta = [re.sub("\xa0| ", "", s) for s in _exacta]
+    exacta1 = [re.sub("\xa0| ", "", s) for s in _exacta1]
+    exacta2 = [re.sub("\xa0| ", "", s) for s in _exacta2]
+    exacta3 = [re.sub("\xa0| ", "", s) for s in _exacta3]
     trio = [re.sub("\xa0| ", "", s) for s in _trio]
     trifecta1 = [re.sub("\xa0| ", "", s) for s in _trifecta1]
     trifecta2 = [re.sub("\xa0| ", "", s) for s in _trifecta2]
     trifecta3 = [re.sub("\xa0| ", "", s) for s in _trifecta3]
-    odds_sets = [quinella, exacta, trio, trifecta1, trifecta2, trifecta3]
+    odds_sets = [quinella, exacta1, exacta2, exacta3, trio, trifecta1, trifecta2, trifecta3]
     odds_items = [font14.render(ods[0], True, (0,0,0)) for ods in odds_sets]
     odds_values = [font14.render(ods[1].rjust(6, " "), True, (0,0,0)) for ods in odds_sets]
 
@@ -215,18 +229,22 @@ def update_odds():
         odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
         
         _quinella = update_data[1][1][2].astype("str").iloc[0,1:].tolist()
-        _exacta = update_data[1][2][2].astype("str").iloc[0,1:].tolist()
+        _exacta1 = update_data[1][2][2].astype("str").iloc[0,1:].tolist()
+        _exacta2 = update_data[1][2][2].astype("str").iloc[1,1:].tolist()
+        _exacta3 = update_data[1][2][2].astype("str").iloc[2,1:].tolist()
         _trio = update_data[1][4][2].astype("str").iloc[0,1:].tolist()
         _trifecta1 = update_data[1][5][2].astype("str").iloc[0,1:].tolist()
         _trifecta2 = update_data[1][5][2].astype("str").iloc[1,1:].tolist()
         _trifecta3 = update_data[1][5][2].astype("str").iloc[2,1:].tolist()
         quinella = [re.sub("\xa0| ", "", s) for s in _quinella]
-        exacta = [re.sub("\xa0| ", "", s) for s in _exacta]
+        exacta1 = [re.sub("\xa0| ", "", s) for s in _exacta1]
+        exacta2 = [re.sub("\xa0| ", "", s) for s in _exacta2]
+        exacta3 = [re.sub("\xa0| ", "", s) for s in _exacta3]
         trio = [re.sub("\xa0| ", "", s) for s in _trio]
         trifecta1 = [re.sub("\xa0| ", "", s) for s in _trifecta1]
         trifecta2 = [re.sub("\xa0| ", "", s) for s in _trifecta2]
         trifecta3 = [re.sub("\xa0| ", "", s) for s in _trifecta3]
-        odds_sets = [quinella, exacta, trio, trifecta1, trifecta2, trifecta3]
+        odds_sets = [quinella, exacta1, exacta2, exacta3, trio, trifecta1, trifecta2, trifecta3]
         odds_items = [font14.render(ods[0], True, (0,0,0)) for ods in odds_sets]
         odds_values = [font14.render(ods[1].rjust(6, " "), True, (0,0,0)) for ods in odds_sets]
 
@@ -241,6 +259,8 @@ else:
     odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
     odds_items, odds_values = favorite_odds(1)
 
+mw_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
+
 Set = True
 Start, Stop, Goal = False, False, False
 this_race = 1
@@ -253,14 +273,17 @@ while True:
     screen.blit(title_text, (90+R, 350+18))
     screen.blit(wg_text, (90+36+R, 378+18))
     y=0
-    for name_text, odds_text in zip(name_objs, odds_objs):
+    # 単勝
+    for name_text, mw_text, odds_text in zip(name_objs, mw_objs, odds_objs):
         screen.blit(name_text, (90+R, 405+18+y))
-        screen.blit(odds_text, (90+85+R, 405+18+y))
+        screen.blit(mw_text, (90+85+R, 405+18+y))
+        screen.blit(odds_text, (90+85+R+50, 405+18+y))
         y += 20
+    # ２連複、２連単 〜
     y=0
     for item_text, value_text in zip(odds_items, odds_values):
-        screen.blit(item_text, (90+150-10+R, 405+18+y))
-        screen.blit(value_text, (90+150-10+50+R, 405+18+y))
+        screen.blit(item_text, (90+150-10+R+50, 405+18+y))
+        screen.blit(value_text, (90+150-10+50+R+60, 405+18+y))
         y += 20
 
     ybtn = 230 + 18
@@ -276,9 +299,9 @@ while True:
     screen.blit(button, (310+R, 350+ybtn))
     screen.blit(goal_text, (310+R+14, 350+ybtn+6))
 
-    update_button = pygame.Rect(400+R, 350+ybtn, 60, 30)
-    screen.blit(button, (400+R, 350+ybtn))
-    screen.blit(goal_text, (400+R+14, 350+ybtn+6))
+    update_button = pygame.Rect(400+R, 235+ybtn, 60, 30)
+    screen.blit(button, (400+R+3, 235+ybtn))
+    screen.blit(update_text, (400+R+9, 235+ybtn+6))
 
     if Set:
         for idx, p in enumerate(start_positions):
@@ -328,6 +351,9 @@ while True:
 
             for n in range(1, len(entries)+1):
                 if btn_objs[n-1].collidepoint(event.pos):
+
+                    screen.blit(mainSurface, (0, 32)) # 
+
                     this_race = n
                     lines, start_positions, goal_positions = load_race(n)
                     raceboad(n)
@@ -353,3 +379,5 @@ while True:
                         odds = races[n-1][2][0][0]["単勝オッズ"].tolist()
                         odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
                         odds_items, odds_values = favorite_odds(n)
+
+                    mw_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]

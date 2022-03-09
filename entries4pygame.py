@@ -38,7 +38,9 @@ def set_entry(entry_df):
         _trials = racer[3].replace("再", "").split()
         handi = _trials[0]
         trial = _trials[1]
-        dev = _trials[2]
+        dev = "0.0"
+        if len(_trials) == 3:
+            dev = _trials[2]
         mean_trial= racer[5].split()[0]
         mean_time = racer[5].split()[1]
         mean_st = racer[6].split()[1]

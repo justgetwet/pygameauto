@@ -80,9 +80,9 @@ def onerace(dt, place, raceNo):
         dfs = get_dfs(url)
         odds.append(dfs)
     
-    result_dfs = get_dfs(result_url)
+    # result_dfs = get_dfs(result_url)
 
-    return [meta, entry_df, odds, pred, result_dfs]
+    return [meta, entry_df, odds, pred]
 
 
 def odds_update(dt, place, raceNo):
@@ -119,8 +119,8 @@ def odds_update(dt, place, raceNo):
 if __name__=='__main__':
 
     # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220306"
-    place = "伊勢崎"
+    dt = "20220310"
+    place = "川口"
     races = []
     for raceNo in [str(n) for n in range(1,13)]:
         start = time.time()
