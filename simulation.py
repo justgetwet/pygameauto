@@ -87,7 +87,7 @@ def simulate(entry):
     if entry[0][8] == "-":
         time_data = [float(d[11])  for d in entry]
     else:
-        time_data = [float(d[8])+float(d[9])  for d in entry]
+        time_data = [float(d[8])+float(d[9]) if d[8] != "-" else 3.99 for d in entry]
     f = lambda x: np.radians(360 * x)/300 + np.radians(90)
     handi_rads = [f(int(d[7].strip("m"))+10) for d in entry] 
 

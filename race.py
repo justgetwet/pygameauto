@@ -1,4 +1,3 @@
-# from turtle import update
 import numpy as np
 import pickle
 import pygame
@@ -56,7 +55,6 @@ for race in races:
         montes.append(race[3]) 
 
 def racer_render(entry, a):
-
 
     n, filename, name, gradu, machine, team, rank, handi = entry[:8]
     trial, dev, mean_trial, mean_time, mean_st = entry[8:]
@@ -259,7 +257,9 @@ else:
     odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
     odds_items, odds_values = favorite_odds(1)
 
+# 予想
 mw_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
+mp_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
 
 Set = True
 Start, Stop, Goal = False, False, False
@@ -274,9 +274,10 @@ while True:
     screen.blit(wg_text, (90+36+R, 378+18))
     y=0
     # 単勝
-    for name_text, mw_text, odds_text in zip(name_objs, mw_objs, odds_objs):
-        screen.blit(name_text, (90+R, 405+18+y))
-        screen.blit(mw_text, (90+85+R, 405+18+y))
+    for name_text, mw_text, mp_text, odds_text in zip(name_objs, mw_objs, mp_objs, odds_objs):
+        screen.blit(name_text, (90+R-50, 405+18+y))
+        screen.blit(mw_text, (90+85+R-50, 405+18+y))
+        screen.blit(mp_text, (90+85+R+50-50, 405+18+y))
         screen.blit(odds_text, (90+85+R+50, 405+18+y))
         y += 20
     # ２連複、２連単 〜
@@ -381,3 +382,4 @@ while True:
                         odds_items, odds_values = favorite_odds(n)
 
                     mw_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
+                    mp_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
