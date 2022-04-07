@@ -38,8 +38,8 @@ filename = args[1]
 with open(filename, mode="rb") as f:
     races = pickle.load(f)
 
-# res = filename.strip("./data/")
-res = filename.strip(".\\data")
+res = filename.strip("./data/")
+# res = filename.strip(".\\data")
 dt, place_en, _ = res.split("_")
 place = place_d[place_en]
 
@@ -222,6 +222,7 @@ def favorite_odds(n):
     return odds_items, odds_values
 
 def update_odds():
+    odds_objs, odds_items, odds_values = [], [], []
     if update_data:
         odds = update_data[1][0][0]["単勝オッズ"].tolist()
         odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
@@ -288,21 +289,21 @@ while True:
         y += 20
 
     ybtn = 230 + 18
-    start_button = pygame.Rect(90+R, 350+ybtn, 60, 30)
-    screen.blit(button, (90+R, 350+ybtn))
-    screen.blit(start_text, (90+R+13, 350+ybtn+6))
+    start_button = pygame.Rect(90+R-20, 350+ybtn, 60, 30)
+    screen.blit(button, (90+R-20, 350+ybtn))
+    screen.blit(start_text, (90+R+13-20, 350+ybtn+6))
 
-    stop_button = pygame.Rect(200+R, 350+ybtn, 60, 30)
-    screen.blit(button, (200+R, 350+ybtn))
-    screen.blit(stop_text, (200+R+14, 350+ybtn+6))
+    stop_button = pygame.Rect(200+R-50, 350+ybtn, 60, 30)
+    screen.blit(button, (200+R-50, 350+ybtn))
+    screen.blit(stop_text, (200+R+14-50, 350+ybtn+6))
 
-    goal_button = pygame.Rect(310+R, 350+ybtn, 60, 30)
-    screen.blit(button, (310+R, 350+ybtn))
-    screen.blit(goal_text, (310+R+14, 350+ybtn+6))
+    goal_button = pygame.Rect(310+R-80, 350+ybtn, 60, 30)
+    screen.blit(button, (310+R-80, 350+ybtn))
+    screen.blit(goal_text, (310+R+14-80, 350+ybtn+6))
 
-    update_button = pygame.Rect(400+R, 235+ybtn, 60, 30)
-    screen.blit(button, (400+R+3, 235+ybtn))
-    screen.blit(update_text, (400+R+9, 235+ybtn+6))
+    update_button = pygame.Rect(400+R-95, 235+115+ybtn, 60, 30)
+    screen.blit(button, (400+R+3-95, 235+115+ybtn))
+    screen.blit(update_text, (400+R+9-95, 235+115+ybtn+6))
 
     if Set:
         for idx, p in enumerate(start_positions):
@@ -345,6 +346,7 @@ while True:
                 Set, Start, Stop = False, False, False
 
             if update_button.collidepoint(event.pos):
+                print(dt, place, this_race)
                 update_data = odds_update(dt, place, this_race)
                 odds_objs, odds_items, odds_values = update_odds()
                 update_trial()
