@@ -38,8 +38,8 @@ filename = args[1]
 with open(filename, mode="rb") as f:
     races = pickle.load(f)
 
-res = filename.strip("./data/")
-# res = filename.strip(".\\data")
+# res = filename.strip("./data/")
+res = filename.strip(".\\data")
 dt, place_en, _ = res.split("_")
 place = place_d[place_en]
 
@@ -259,8 +259,10 @@ else:
     odds_items, odds_values = favorite_odds(1)
 
 # 予想
-mw_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
-mp_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
+ml_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
+mw_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
+mp_objs = [font14.render(str(round(m[3], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
+
 
 Set = True
 Start, Stop, Goal = False, False, False
@@ -275,17 +277,18 @@ while True:
     screen.blit(wg_text, (90+36+R, 378+18))
     y=0
     # 単勝
-    for name_text, mw_text, mp_text, odds_text in zip(name_objs, mw_objs, mp_objs, odds_objs):
+    for name_text, mw_text, ml_text, mp_text, odds_text in zip(name_objs, ml_objs, mw_objs, mp_objs, odds_objs):
         screen.blit(name_text, (90+R-50, 405+18+y))
-        screen.blit(mw_text, (90+85+R-50, 405+18+y))
-        screen.blit(mp_text, (90+85+R+50-50, 405+18+y))
-        screen.blit(odds_text, (90+85+R+50, 405+18+y))
+        screen.blit(ml_text, (90+85+R-50, 405+18+y))
+        screen.blit(mw_text, (90+85+R-50+50, 405+18+y))
+        screen.blit(mp_text, (90+85+R+50-50+50, 405+18+y))
+        screen.blit(odds_text, (90+85+R+50-50+100, 405+18+y))
         y += 20
     # ２連複、２連単 〜
     y=0
     for item_text, value_text in zip(odds_items, odds_values):
-        screen.blit(item_text, (90+150-10+R+50, 405+18+y))
-        screen.blit(value_text, (90+150-10+50+R+60, 405+18+y))
+        screen.blit(item_text, (90+150-10+R+50+50, 405+18+y))
+        screen.blit(value_text, (90+150-10+50+R+60+50, 405+18+y))
         y += 20
 
     ybtn = 230 + 18
@@ -383,5 +386,6 @@ while True:
                         odds_objs = [font14.render(str(ods).rjust(5, " "), True, (0,0,0)) for ods in odds]
                         odds_items, odds_values = favorite_odds(n)
 
-                    mw_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
-                    mp_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
+                    ml_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
+                    mw_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
+                    mp_objs = [font14.render(str(round(m[3], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]

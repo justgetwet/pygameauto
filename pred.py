@@ -30,6 +30,7 @@ def pred30(entry_df):
     handis = [float(item.split()[0].strip("m"))/1000 for item in entry_df.iloc[:,3].values]
 
     time_data = []
+    time_last5 = []
     for racer, handi in zip(racers, handis):
         url = playerdetail + racercode_d[racer]
         dfs = get_dfs(url)
@@ -46,34 +47,45 @@ def pred30(entry_df):
                 times.append(race_time)  
         data = np.array(times) + handi
         time_data.append(data)
+        time_last5.append(data[:5])
     
-    wins, places = [], []
+    rens, wins, places = [], [], []
     for _ in range(8000):
+        last5_times = [np.random.choice(times) for times in time_last5]
+        l = min(last5_times)
+        l_indexes = [i+1 for i, x in enumerate(last5_times) if x == l]
+        l = np.random.choice(l_indexes)
+
         race_times = [np.random.choice(times) for times in time_data]
         m = min(race_times)
         w_indexes = [i+1 for i, x in enumerate(race_times) if x == m]
         w = np.random.choice(w_indexes)
-        race_times[w-1] = 3.5 # dummy
+        
+        race_times[w-1] = 3.9 # dummy
         n = min(race_times)
         p_indexes = [i+1 for i, x in enumerate(race_times) if x == n]
         p = np.random.choice(p_indexes)
+        
+        rens.append(l)
         wins.append(w)
         places.append(p)
-
+        
+    l_hist, _  = np.histogram(rens, bins=range(1, len(time_last5)+2))
+    l_rates = 100 * l_hist / l_hist.sum()
     w_hist, _  = np.histogram(wins, bins=range(1, len(time_data)+2))
     w_rates = 100 * w_hist / w_hist.sum()
     p_hist, _  = np.histogram(places, bins=range(1, len(time_data)+2))
     p_rates = 100 * p_hist / p_hist.sum()
 
     res = []
-    for i, (w, p) in enumerate(zip(w_rates, p_rates)):
-        res.append((i+1, w, p))
+    for i, (l, w, p) in enumerate(zip(l_rates, w_rates, p_rates)):
+        res.append((i+1, l, w, p))
         
     return res
 
 if __name__ == "__main__":
 
-    filename = "data/20220302_isesaki_data.pickle"
+    filename = "data/20220407_isesaki_data.pickle"
     with open(filename, mode="rb") as f:
         races = pickle.load(f)
 
