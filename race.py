@@ -65,7 +65,12 @@ def racer_render(entry, a):
     if trial == "-":
         trial_time, st_trialplusdev, acc_time = "", mean_st, ""
     else:
-        st_trialplusdev = mean_st + " " + str(round(float(trial) + float(dev), 3))
+        # 試走偏差
+        trialplusdev = float(trial) + float(dev)
+        dist = 31 + int(handi.strip("m"))/100
+        print(trialplusdev * dist)
+        
+        st_trialplusdev = mean_st + " " + str(round(trialplusdev, 3))
         acc_time = str(round(a, 1)) + "  "  + str(round(float(trial) + float(dev), 3))
 
     x_d = {n: 15+96*(n-1) for n in range(1,9)}
@@ -130,11 +135,17 @@ def update_trial():
         racers = set_entry(entry_df)
         for i, racer in enumerate(racers):
             trial, dev, mean_st = racer[8], racer[9], racer[12]
+            handi = racer[7]
             if trial == "-":
                 print("no trial data.")
             else:
                 trial_time = trial + " " + dev
-                st_trialplusdev = mean_st + " " + str(round(float(trial) + float(dev), 3))
+                # 試走偏差
+                trialplusdev = float(trial) + float(dev)
+                dist = 31 + int(handi.strip("m"))/100
+                print(trialplusdev * dist)
+                
+                st_trialplusdev = mean_st + " " + str(round(trialplusdev, 3))
                 st_text = font14.render(st_trialplusdev, True, (0,0,0))
                 trial_text = font14.render(trial_time, True, (0,0,0))
                 x = x_d[i+1]

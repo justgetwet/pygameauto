@@ -38,13 +38,11 @@ def pred30(entry_df):
         times = []
         for row in df.itertuples():
             race_time = 0
-            if type(row[7]) == str and row[7][0] == "良" and row[9] != "-":
-                if type(row[9]) == str: 
-                    race_time = float(re.sub("再| ","", row[9]))
-                else:
-                    race_time = row[9]
+            if type(row[7]) == str and row._7[0] == "良" and row.試走T != "-":
+                race_time = float(row.競走T)
             if race_time:
                 times.append(race_time)  
+        # print(racer, times[:10])
         data = np.array(times) + handi
         time_data.append(data)
         time_last5.append(data[:5])
@@ -85,11 +83,11 @@ def pred30(entry_df):
 
 if __name__ == "__main__":
 
-    filename = "data/20220407_isesaki_data.pickle"
+    filename = "data/20220408_isesaki_data.pickle"
     with open(filename, mode="rb") as f:
         races = pickle.load(f)
 
     entry_df = races[1][1]
     res = pred30(entry_df)
-    for tp in res:
-        print(tp)
+    # for tp in res:
+    #     print(tp)
