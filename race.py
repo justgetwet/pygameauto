@@ -38,8 +38,8 @@ filename = args[1]
 with open(filename, mode="rb") as f:
     races = pickle.load(f)
 
-# res = filename.strip("./data/")
-res = filename.strip(".\\data")
+res = filename.strip("./data/")
+# res = filename.strip(".\\data")
 dt, place_en, _ = res.split("_")
 place = place_d[place_en]
 
@@ -62,13 +62,14 @@ def racer_render(entry, a):
     handi_rank = handi.rjust(4, " ") + " " + rank
     trial_time = trial + " " + dev
     mean_time = mean_trial + " " + mean_time
+    trialxdist = 0.0
     if trial == "-":
         trial_time, st_trialplusdev, acc_time = "", mean_st, ""
     else:
         # 試走偏差
         trialplusdev = float(trial) + float(dev)
         dist = 31 + int(handi.strip("m"))/100
-        print(trialplusdev * dist)
+        trialxdist = trialplusdev * dist
         
         st_trialplusdev = mean_st + " " + str(round(trialplusdev, 3))
         acc_time = str(round(a, 1)) + "  "  + str(round(float(trial) + float(dev), 3))
@@ -112,12 +113,17 @@ def racer_render(entry, a):
     acc_text = font14.render(acc_time, True, nero)
     screen.blit(acc_text, (x+4, 230-30+14+18))
 
+    return trialxdist
+
 def load_race(n):
     # exec racer_render()
     lines, acc = simulate(entries[n-1])
 
+    trialxdists = []
     for entry, a in zip(entries[n-1], acc):
-        racer_render(entry, a)
+        # rendering
+        trialxdist = racer_render(entry, a)
+        trialxdists.append(trialxdist)
 
     start_positions, goal_positions = [], []
     for line in lines:
@@ -133,6 +139,7 @@ def update_trial():
     if update_data:
         entry_df = update_data[0]
         racers = set_entry(entry_df)
+        trialxdists = []
         for i, racer in enumerate(racers):
             trial, dev, mean_st = racer[8], racer[9], racer[12]
             handi = racer[7]
@@ -143,8 +150,9 @@ def update_trial():
                 # 試走偏差
                 trialplusdev = float(trial) + float(dev)
                 dist = 31 + int(handi.strip("m"))/100
-                print(trialplusdev * dist)
-                
+                trialxdist = trialplusdev * dist
+                trialxdists.append(trialxdist)
+
                 st_trialplusdev = mean_st + " " + str(round(trialplusdev, 3))
                 st_text = font14.render(st_trialplusdev, True, (0,0,0))
                 trial_text = font14.render(trial_time, True, (0,0,0))
@@ -152,6 +160,11 @@ def update_trial():
                 # print(x)
                 screen.blit(trial_text, (x+4, 176-30+14+18))
                 screen.blit(st_text, (x+4, 212-30+14+18))
+
+        minFullTime = min(trialxdists)
+        goaldists = (np.array(trialxdists) - minFullTime) * 100
+        for i, dist in enumerate(goaldists):
+            print(i+1, round(dist))
 
 windows_title = " ".join(races[0][0][:2])
 
