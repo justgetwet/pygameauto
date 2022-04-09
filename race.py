@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import pickle
 import pygame
 from pygame.locals import QUIT
@@ -34,13 +35,14 @@ place_d = {"kawaguchi": "川口", "isesaki": "伊勢崎", "hamamatsu": "浜松",
 
 args = sys.argv 
 
-filename = args[1]
-with open(filename, mode="rb") as f:
+filepath = args[1]
+with open(filepath, mode="rb") as f:
     races = pickle.load(f)
 
-res = filename.strip("./data/")
+# res = filename.strip("./data/")
 # res = filename.strip(".\\data")
-dt, place_en, _ = res.split("_")
+filename = os.path.basename(filepath)
+dt, place_en, _ = filename.split("_")
 place = place_d[place_en]
 
 race_titles = []
@@ -136,6 +138,7 @@ update_data = []
 
 def update_trial():
     x_d = {n: 15+96*(n-1) for n in range(1,9)}
+    goaldists = []
     if update_data:
         entry_df = update_data[0]
         racers = set_entry(entry_df)
@@ -163,8 +166,10 @@ def update_trial():
 
         minFullTime = min(trialxdists)
         goaldists = (np.array(trialxdists) - minFullTime) * 100
-        for i, dist in enumerate(goaldists):
-            print(i+1, round(dist))
+        # for i, dist in enumerate(goaldists):
+        #     print(i+1, round(dist))
+
+    return list(goaldists)
 
 windows_title = " ".join(races[0][0][:2])
 
@@ -287,6 +292,7 @@ ml_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m
 mw_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
 mp_objs = [font14.render(str(round(m[3], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[0]]
 
+dist_objs = [font14.render(" ".rjust(3, " "), True, (0,0,0)) for _ in range(len(montes[0]))]
 
 Set = True
 Start, Stop, Goal = False, False, False
@@ -301,18 +307,20 @@ while True:
     screen.blit(wg_text, (90+36+R, 378+18))
     y=0
     # 単勝
-    for name_text, mw_text, ml_text, mp_text, odds_text in zip(name_objs, ml_objs, mw_objs, mp_objs, odds_objs):
-        screen.blit(name_text, (90+R-50, 405+18+y))
-        screen.blit(ml_text, (90+85+R-50, 405+18+y))
-        screen.blit(mw_text, (90+85+R-50+50, 405+18+y))
-        screen.blit(mp_text, (90+85+R+50-50+50, 405+18+y))
-        screen.blit(odds_text, (90+85+R+50-50+100, 405+18+y))
+
+    for name_text, mw_text, ml_text, mp_text, dist_text, odds_text in zip(name_objs, ml_objs, mw_objs, mp_objs, dist_objs, odds_objs):
+        screen.blit(name_text, (90+R-50-10, 405+18+y))
+        screen.blit(ml_text, (90+85+R-50-10, 405+18+y))
+        screen.blit(mw_text, (90+85+R-50+50-10, 405+18+y))
+        screen.blit(mp_text, (90+85+R+50-50+50-10, 405+18+y))
+        screen.blit(dist_text, (90+85+R+50-50+50+50-10, 405+18+y))
+        screen.blit(odds_text, (90+85+R+50-50+100+20, 405+18+y))
         y += 20
     # ２連複、２連単 〜
     y=0
     for item_text, value_text in zip(odds_items, odds_values):
-        screen.blit(item_text, (90+150-10+R+50+50, 405+18+y))
-        screen.blit(value_text, (90+150-10+50+R+60+50, 405+18+y))
+        screen.blit(item_text, (90+150-10+R+50+50+20, 405+18+y))
+        screen.blit(value_text, (90+150-10+50+R+60+50+20, 405+18+y))
         y += 20
 
     ybtn = 230 + 18
@@ -376,7 +384,11 @@ while True:
                 print(dt, place, this_race)
                 update_data = odds_update(dt, place, this_race)
                 odds_objs, odds_items, odds_values = update_odds()
-                update_trial()
+                goaldists = update_trial()
+                if goaldists:
+                    dist_objs = [font14.render(str(round(dst)).rjust(3, " "), True, (0,0,0)) for dst in goaldists]
+                else:
+                    dist_objs = [font14.render(" ".rjust(3, " "), True, (0,0,0)) for _ in range(len(odds_objs))]
                 # lines, start_positions, goal_positions = update_race(int(this_race))
 
             for n in range(1, len(entries)+1):
@@ -413,3 +425,4 @@ while True:
                     ml_objs = [font14.render(str(round(m[1], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
                     mw_objs = [font14.render(str(round(m[2], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
                     mp_objs = [font14.render(str(round(m[3], 1)).rjust(5, " "), True, (0,0,0)) for m in montes[n-1]]
+                    dist_objs = [font14.render(" ".rjust(3, " "), True, (0,0,0)) for _ in range(len(montes[n-1]))]
