@@ -164,6 +164,7 @@ def update_trial():
                 screen.blit(trial_text, (x+4, 176-30+14+18))
                 screen.blit(st_text, (x+4, 212-30+14+18))
 
+        print(trialxdists)
         minFullTime = min(trialxdists)
         goaldists = (np.array(trialxdists) - minFullTime) * 100
         # for i, dist in enumerate(goaldists):

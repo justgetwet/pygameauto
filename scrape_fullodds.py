@@ -1,6 +1,7 @@
 ua = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.57"}
 from bs4 import BeautifulSoup
 from datetime import datetime
+import numpy as np
 import pandas as pd
 import pickle
 import re
@@ -51,11 +52,10 @@ def onerace(dt, place, raceNo):
     exacta_url = url_oddspark + "/Odds.do?" + race_url + "&betType=5&viewType=0"
     wide_url = url_oddspark + "/Odds.do?" + race_url + "&betType=7&viewType=0"
     trio_url = url_oddspark + "/Odds.do?" + race_url + "&betType=9&viewType=0" 
+    
     odds_urls = [win_place_url, quinella_url, exacta_url, wide_url, trio_url]
     
     trifecta_url = url_oddspark + "/Odds.do?" + race_url + "&viewType=0&betType=8"
-
-    result_url = url_oddspark + "/RaceResult.do?" + race_url
 
     dfs = get_dfs(entry_url)
     if dfs:
@@ -78,24 +78,43 @@ def onerace(dt, place, raceNo):
         trifecta_bike_url = trifecta_url + f"&bikeNo={bike}&jikuNo=1"
         dfs = get_dfs(trifecta_bike_url)
         trifectas.append(dfs)
-    
-    result_dfs = get_dfs(result_url)
 
-    return [meta, entry_df, odds, trifectas, result_dfs]
+    return [meta, entry_df, odds, trifectas]
 
 
 if __name__=='__main__':
 
     # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220224"
-    place = "浜松"
-    races = []
-    for raceNo in [str(n) for n in range(1,13)]:
-        start = time.time()
-        race = onerace(dt, place, raceNo)
-        races.append(race)
-        print(raceNo, time.time()-start, "sec")
+    dt = "20220410"
+    place = "伊勢崎"
 
-    filename = "./data/" + dt + "_" + placeEn_d[place] + "_" + "full_odds.pickle"
-    with open(filename, "wb") as f:
-        pickle.dump(races, f, pickle.HIGHEST_PROTOCOL)
+    race = onerace(dt, place, 1)
+    print(race[0])
+    winplace_df = race[2][0][0]
+    quinella_df = race[2][1][2]
+    exacta_df = race[2][2]
+    wide_df = race[2][3]
+    trio_df = race[2][4]
+    
+    odds_d = {}
+
+    for t in winplace_df.itertuples():
+        odds_d[str(t.車番)] = t.単勝オッズ
+
+    for i, t in enumerate(quinella_df.itertuples()):
+        for j, v in enumerate(t[2::2]):
+            s = str(j+1) + "=" + str(j+i+2)
+            if not np.isnan(v):
+                odds_d[s] = v
+
+    print(odds_d)
+    # races = []
+    # for raceNo in [str(n) for n in range(1,13)]:
+    #     start = time.time()
+    #     race = onerace(dt, place, raceNo)
+    #     races.append(race)
+    #     print(raceNo, time.time()-start, "sec")
+
+    # filename = "./data/" + dt + "_" + placeEn_d[place] + "_" + "full_odds.pickle"
+    # with open(filename, "wb") as f:
+    #     pickle.dump(races, f, pickle.HIGHEST_PROTOCOL)
