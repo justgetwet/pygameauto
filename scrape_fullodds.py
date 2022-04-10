@@ -92,9 +92,10 @@ if __name__=='__main__':
     print(race[0])
     winplace_df = race[2][0][0]
     quinella_df = race[2][1][2]
-    exacta_df = race[2][2]
+    exacta_df = race[2][2][2]
     wide_df = race[2][3]
     trio_df = race[2][4]
+    trifs = race[3]
     
     odds_d = {}
 
@@ -106,6 +107,20 @@ if __name__=='__main__':
             s = str(j+1) + "=" + str(j+i+2)
             if not np.isnan(v):
                 odds_d[s] = v
+
+    for i, t in enumerate(exacta_df.itertuples()):
+        if i > 1:
+            for j, v in enumerate(t[3:]):
+                value = float(v)
+                if not np.isnan(value):
+                    s = str(j+1) + "-" + str(i-1)
+                    odds_d[s] = value
+
+    for trif in trifs:
+        for df in trif[2:]:
+            for t in df.itertuples():
+                s = "".join(t.車番.replace("→", "-").split())
+                odds_d[s] = t.オッズ
 
     print(odds_d)
     # races = []
