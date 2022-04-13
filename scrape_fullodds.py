@@ -82,13 +82,8 @@ def onerace(dt, place, raceNo):
     return [meta, entry_df, odds, trifectas]
 
 
-if __name__=='__main__':
-
-    # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220410"
-    place = "伊勢崎"
-
-    race = onerace(dt, place, 1)
+def odds_dict(dt, place, raceNo):
+    race = onerace(dt, place, raceNo)
     print(race[0])
     winplace_df = race[2][0][0]
     quinella_df = race[2][1][2]
@@ -122,7 +117,21 @@ if __name__=='__main__':
                 s = "".join(t.車番.replace("→", "-").split())
                 odds_d[s] = t.オッズ
 
-    print(odds_d)
+    return odds_d
+
+
+if __name__=='__main__':
+
+    # dt = datetime.now().strftime("%Y%m%d")
+    dt = "20220413"
+    place = "山陽"
+    r = 8
+
+    odds_d = odds_dict(dt, place, r)
+    bets = "3-4", "3-7", "4-7"
+    for bet in bets:
+        print(odds_d[bet])
+
     # races = []
     # for raceNo in [str(n) for n in range(1,13)]:
     #     start = time.time()
