@@ -56,6 +56,7 @@ for race in races:
         entries.append(entry_data)
         montes.append(race[3]) 
 
+# か
 def racer_render(entry, a):
 
     n, filename, name, gradu, machine, team, rank, handi = entry[:8]
@@ -165,12 +166,15 @@ def update_trial():
                 screen.blit(st_text, (x+4, 212-30+14+18))
 
         print(trialxdists)
-        minFullTime = min(trialxdists)
-        goaldists = (np.array(trialxdists) - minFullTime) * 100
-        # for i, dist in enumerate(goaldists):
-        #     print(i+1, round(dist))
+        try:
+            minFullTime = min(trialxdists)
+            goaldists = (np.array(trialxdists) - minFullTime) * 100
+        except:
+            return []
 
     return list(goaldists)
+
+# ここから
 
 windows_title = " ".join(races[0][0][:2])
 

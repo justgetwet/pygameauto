@@ -13,7 +13,7 @@ url_oddspark = "https://www.oddspark.com/autorace"
 
 placeCd_d = {'川口': '02', '伊勢崎': '03', '浜松': '04', '飯塚': '05', '山陽': '06'}
 placeEn_d = {'川口': 'kawaguchi', '伊勢崎': 'isesaki', '浜松': 'hamamatsu',\
-            '飯塚': 'iiduka', '山陽': 'sanyo'}
+            '飯塚': 'iizuka', '山陽': 'sanyo'}
 
 def get_dfs(url):
     res = requests.get(url, headers=ua)
@@ -119,8 +119,8 @@ def odds_update(dt, place, raceNo):
 if __name__=='__main__':
 
     # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220413"
-    place = "山陽"
+    dt = "20220522"
+    place = "伊勢崎"
     races = []
     for raceNo in [str(n) for n in range(1,13)]:
         time.sleep(3)
