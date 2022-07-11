@@ -119,7 +119,7 @@ def odds_update(dt, place, raceNo):
 if __name__=='__main__':
 
     # dt = datetime.now().strftime("%Y%m%d")
-    dt = "20220522"
+    dt = "20220711"
     place = "伊勢崎"
     races = []
     for raceNo in [str(n) for n in range(1,13)]:

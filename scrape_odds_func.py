@@ -79,6 +79,6 @@ def oddswin(race):
 
 if __name__ == '__main__':
 
-    race = onerace("20220227", "川口", "12")
+    race = onerace("20220625", "", "12")
     df = oddswin(race)
     print(df)
